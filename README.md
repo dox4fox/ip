@@ -34,7 +34,6 @@
         .loading {
             text-align: center;
             margin: 20px 0;
-            display: none;
         }
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
@@ -92,61 +91,57 @@
 <body>
     <div class="container">
         <h1>Определение IP-адреса и страны</h1>
-
+        
         <div class="info-box">
             <p>Для определения вашего IP-адреса и страны будет использоваться внешний API. Это может занять несколько секунд.</p>
         </div>
-
+        
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>Получаю информацию...</p>
         </div>
-
+        
         <button id="getDataBtn">Получить информацию</button>
-
+        
         <div class="result" id="result">
             <p>Ваш IP-адрес: <span class="ip-address" id="ipAddress"></span></p>
             <p>Страна: <span class="country" id="country"></span></p>
             <p>Координаты: <span class="coordinates" id="coordinates"></span></p>
         </div>
-
+        
         <div class="error" id="error"></div>
     </div>
 
     <script>
         document.getElementById('getDataBtn').addEventListener('click', async function() {
-            // Показываем спиннер и скрываем результат/ошибку
+            // Показываем спиннер и скрываем результат
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result').style.display = 'none';
             document.getElementById('error').textContent = '';
-
+            
             try {
                 // Используем API ipapi.co для получения информации
                 const response = await fetch('https://ipapi.co/json/');
-
+                
                 if (!response.ok) {
-                    throw new Error(`Ошибка сервера: ${response.status}`);
+                    throw new Error('Не удалось получить данные. Проверьте подключение к интернету.');
                 }
-
+                
                 const data = await response.json();
-
+                
                 // Заполняем результат
                 document.getElementById('ipAddress').textContent = data.ip;
                 document.getElementById('country').textContent = `${data.country_name} (${data.country_code})`;
                 document.getElementById('coordinates').textContent = `${data.latitude}, ${data.longitude}`;
-
+                
                 // Скрываем спиннер и показываем результат
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('result').style.display = 'block';
-
+                
             } catch (error) {
                 // Показываем ошибку
-                document.getElementById('error').textContent =
-                    'Не удалось получить данные. Возможные причины: ' +
-                    'нет подключения к интернету, API недоступен или блокируется браузером. ' +
-                    'Попробуйте открыть страницу на сервере или использовать другой браузер.';
+                document.getElementById('error').textContent = error.message;
                 document.getElementById('loading').style.display = 'none';
-                console.error('Ошибка:', error);
             }
         });
     </script>
