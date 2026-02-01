@@ -5,21 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Определение IP и страны</title>
     <style>
-        /* Ваши стили остаются без изменений */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; color: #333; }
-        .container { background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; }
-        .info-box { background-color: #f8f9fa; border-radius: 5px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #3498db; }
-        .loading { text-align: center; margin: 20px 0; display: none; }
-        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .error { color: #e74c3c; text-align: center; margin-top: 20px; }
-        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; display: block; margin: 20px auto; transition: background-color 0.3s; }
-        button:hover { background-color: #2980b9; }
-        .result { margin-top: 20px; padding: 15px; border-radius: 5px; background-color: #eaf7ff; display: none; }
-        .ip-address { font-weight: bold; color: #2c3e50; }
-        .country { font-weight: bold; color: #3498db; }
-        .coordinates { color: #7f8c8d; font-size: 14px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #eaf7ff;
+            display: none;
+        }
+        .ip-address {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .country {
+            font-weight: bold;
+            color: #3498db;
+        }
+        .coordinates {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -54,21 +121,19 @@
             document.getElementById('error').textContent = '';
 
             try {
-                // 1. Получаем IP через ipify (без CORS)
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                if (!ipResponse.ok) throw new Error('Не удалось получить IP');
-                const ipData = await ipResponse.json();
-                const ip = ipData.ip;
+                // Используем API ipapi.co для получения информации
+                const response = await fetch('https://ipapi.co/json/');
 
-                // 2. Получаем информацию о стране через ip-api.com (без CORS)
-                const geoResponse = await fetch(`http://ip-api.com/json/${ip}`);
-                if (!geoResponse.ok) throw new Error('Не удалось получить данные о стране');
-                const geoData = await geoResponse.json();
+                if (!response.ok) {
+                    throw new Error(`Ошибка сервера: ${response.status}`);
+                }
+
+                const data = await response.json();
 
                 // Заполняем результат
-                document.getElementById('ipAddress').textContent = ip;
-                document.getElementById('country').textContent = `${geoData.country} (${geoData.countryCode})`;
-                document.getElementById('coordinates').textContent = `${geoData.lat}, ${geoData.lon}`;
+                document.getElementById('ipAddress').textContent = data.ip;
+                document.getElementById('country').textContent = `${data.country_name} (${data.country_code})`;
+                document.getElementById('coordinates').textContent = `${data.latitude}, ${data.longitude}`;
 
                 // Скрываем спиннер и показываем результат
                 document.getElementById('loading').style.display = 'none';
